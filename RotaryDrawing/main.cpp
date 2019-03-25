@@ -7,6 +7,7 @@
 #include <QtSerialPort/QtSerialPort>
 #include <string>
 #include <QPainter>
+#include <QtWidgets>
 
 
 class Widget : public QWidget
@@ -49,7 +50,7 @@ int main(int argc, char *argv[])
 		w.show();
 
 		QPainter painter(&w);
-		painter.setPen(QPen(Qt::black, 12, Qt::DashDotLine, Qt::RoundCap));
+		painter.setPen(QPen(Qt::black, 12, Qt::SolidLine, Qt::RoundCap));
 
         while(serial.isOpen())
         {
@@ -71,7 +72,7 @@ int main(int argc, char *argv[])
                 }
                 else if (!strncmp(input, "RP",2))
                 {
-					rRotaryCounter:last = rRotaryCounter;
+					rRotaryCounter_last = rRotaryCounter;
 					rRotaryCounter++;
                     std::cout << "rRotaryCounter: " << rRotaryCounter << std::endl;
                 }
