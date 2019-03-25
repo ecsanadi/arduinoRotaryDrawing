@@ -8,6 +8,9 @@
 #include <string>
 #include <QPainter>
 #include <QtWidgets>
+#include <iterator>
+#include <vector>
+#include <list>
 
 
 class Widget : public QWidget
@@ -54,6 +57,8 @@ int main(int argc, char *argv[])
 
 		Points point;
 		Points point_last;
+
+		std::list<Points> pointList;
 
 		Widget w;
 		w.show();
@@ -108,6 +113,17 @@ int main(int argc, char *argv[])
                 else if (!strncmp(input, "BL", 2))
                 {
                     std::cout << "Left button clicked!"<<std::endl;
+					for (std::list<Points>::iterator it=pointList.end(); it!=pointList.begin(); --it)
+					{
+						std::cout << ' ' << it->x << " " << it->y << std::endl;
+						//painter.eraseRect(it->x - *std::(it->x), it->y - *std::prev(it->y),1,1);
+						if (it!=pointList.begin()){
+						std::list<Points>::iterator itPrev = it;
+						itPrev--;
+						painter.eraseRect(it->x - itPrev->x, it->y - itPrev->y,1,1);
+						}
+					}
+
                 }
                 else if (!strncmp(input, "BR", 2))
                 {
@@ -116,6 +132,16 @@ int main(int argc, char *argv[])
 
 
 				painter.drawLine(point_last.x, point_last.y, point.x, point.y);
+				if (pointList.size() >= 20)
+				{
+				  pointList.pop_front();
+				}
+				pointList.push_back(point_last);
+				if (pointList.size() >= 20)
+				{
+				  pointList.pop_front();
+				}
+				pointList.push_back(point);
 
             }
         }
