@@ -21,6 +21,13 @@ protected:
 	}
 };
 
+class Points
+{
+public:
+	int x;
+	int y;
+};
+
 int main(int argc, char *argv[])
 { 
 
@@ -41,10 +48,12 @@ int main(int argc, char *argv[])
             qDebug() << serial.errorString();
         qDebug() << serial.bytesAvailable();
 
-        int lRotaryCounter = 0;
-        int rRotaryCounter = 0;
-		int lRotaryCounter_last = 0;
-		int rRotaryCounter_last = 0;
+
+		//int lRotaryCounter_last = 0;
+		//int rRotaryCounter_last = 0;
+
+		Points point;
+		Points point_last;
 
 		Widget w;
 		w.show();
@@ -66,27 +75,35 @@ int main(int argc, char *argv[])
 
                 if (!strncmp(input, "RM", 2))
                 {
-					rRotaryCounter_last = rRotaryCounter;
+					/*rRotaryCounter_last = rRotaryCounter;
 					rRotaryCounter--;
-                    std::cout << "rRotaryCounter: " << rRotaryCounter << std::endl;
+					std::cout << "rRotaryCounter: " << rRotaryCounter << std::endl;*/
+					point_last.y = point.y;
+					point.y -= 1;
                 }
                 else if (!strncmp(input, "RP",2))
                 {
-					rRotaryCounter_last = rRotaryCounter;
+					/*rRotaryCounter_last = rRotaryCounter;
 					rRotaryCounter++;
-                    std::cout << "rRotaryCounter: " << rRotaryCounter << std::endl;
+					std::cout << "rRotaryCounter: " << rRotaryCounter << std::endl;*/
+					point_last.y = point.y;
+					point.y += 1;
                 }
                 else if (!strncmp(input, "LM",2))
                 {
-					lRotaryCounter_last = lRotaryCounter;
+					/*lRotaryCounter_last = lRotaryCounter;
 					lRotaryCounter--;
-                    std::cout << "lRotaryCounter: " << lRotaryCounter << std::endl;
+					std::cout << "lRotaryCounter: " << lRotaryCounter << std::endl;*/
+					point_last.x = point.x;
+					point.x -= 1;
                 }
                 else if (!strncmp(input, "LP",2))
                 {
-					lRotaryCounter_last = lRotaryCounter;
+					/*lRotaryCounter_last = lRotaryCounter;
 					lRotaryCounter++;
-                    std::cout << "lRotaryCounter: " << lRotaryCounter << std::endl;
+					std::cout << "lRotaryCounter: " << lRotaryCounter << std::endl;*/
+					point_last.x = point.x;
+					point.x += 1;
                 }
                 else if (!strncmp(input, "BL", 2))
                 {
@@ -98,7 +115,7 @@ int main(int argc, char *argv[])
                 }
 
 
-				painter.drawLine(lRotaryCounter_last, rRotaryCounter_last, lRotaryCounter, rRotaryCounter);
+				painter.drawLine(point_last.x, point_last.y, point.x, point.y);
 
             }
         }
