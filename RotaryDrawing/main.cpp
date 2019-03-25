@@ -6,6 +6,19 @@
 #include <QDebug>
 #include <QtSerialPort/QtSerialPort>
 #include <string>
+#include <QPainter>
+
+
+class Widget : public QWidget
+{
+protected:
+	void paintEvent(QPaintEvent *event)
+	{
+		QPainter painter(this);
+		painter.setPen(QPen(Qt::black, 12, Qt::DashDotLine, Qt::RoundCap));
+		painter.drawLine(0, 0, 200, 200);
+	}
+};
 
 int main(int argc, char *argv[])
 { 
@@ -29,6 +42,14 @@ int main(int argc, char *argv[])
 
         int lRotaryCounter = 0;
         int rRotaryCounter = 0;
+		int lRotaryCounter_last = 0;
+		int rRotaryCounter_last = 0;
+
+		Widget w;
+		w.show();
+
+		QPainter painter(&w);
+		painter.setPen(QPen(Qt::black, 12, Qt::DashDotLine, Qt::RoundCap));
 
         while(serial.isOpen())
         {
@@ -44,22 +65,26 @@ int main(int argc, char *argv[])
 
                 if (!strncmp(input, "RM", 2))
                 {
-                    rRotaryCounter--;
+					rRotaryCounter_last = rRotaryCounter;
+					rRotaryCounter--;
                     std::cout << "rRotaryCounter: " << rRotaryCounter << std::endl;
                 }
                 else if (!strncmp(input, "RP",2))
                 {
-                    rRotaryCounter++;
+					rRotaryCounter:last = rRotaryCounter;
+					rRotaryCounter++;
                     std::cout << "rRotaryCounter: " << rRotaryCounter << std::endl;
                 }
                 else if (!strncmp(input, "LM",2))
                 {
-                    lRotaryCounter--;
+					lRotaryCounter_last = lRotaryCounter;
+					lRotaryCounter--;
                     std::cout << "lRotaryCounter: " << lRotaryCounter << std::endl;
                 }
                 else if (!strncmp(input, "LP",2))
                 {
-                    lRotaryCounter++;
+					lRotaryCounter_last = lRotaryCounter;
+					lRotaryCounter++;
                     std::cout << "lRotaryCounter: " << lRotaryCounter << std::endl;
                 }
                 else if (!strncmp(input, "BL", 2))
@@ -71,10 +96,11 @@ int main(int argc, char *argv[])
                     std::cout << "Right button clicked!"<<std::endl;
                 }
 
+
+				painter.drawLine(lRotaryCounter_last, rRotaryCounter_last, lRotaryCounter, rRotaryCounter);
+
             }
         }
         return 0;
 
 }
-
-
