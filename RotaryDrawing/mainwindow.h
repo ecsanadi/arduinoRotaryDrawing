@@ -14,6 +14,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void paintEvent(QPaintEvent *event);
+    void b_on_toggleDrawing_triggered();
 
 private:
     Ui::MainWindow *ui;

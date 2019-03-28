@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2019-03-22T09:11:22
+# Project created by QtCreator 2019-03-25T17:34:04
 #
 #-------------------------------------------------
 
@@ -8,7 +8,9 @@ QT       += core gui serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = RotaryDrawing
+requires(qtConfig(combobox))
+
+TARGET = testrotary
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -23,10 +25,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-SOURCES += \
-        main.cpp
+HEADERS       = renderarea.h \
+                window.h \
+    points.h \
+    serialreader.h
 
-HEADERS +=
+SOURCES       = main.cpp \
+    renderarea.cpp \
+    window.cpp \
+    points.cpp \
+    serialreader.cpp
 
-FORMS += \
-        mainwindow.ui
+RESOURCES     =  testrotary.qrc
+
+# install
+target.path = $$[QT_INSTALL_EXAMPLES]/widgets/painting/basicdrawing
+INSTALLS += target
