@@ -53,7 +53,7 @@ SerialReader::SerialReader()
 
 void SerialReader::readingSerial()
 {
-    std::cout << __FILE__ <<": "<< __LINE__ << std::endl;
+
 
     QObject::connect(&serial, &QSerialPort::readyRead, [&]
         {
@@ -96,7 +96,7 @@ void SerialReader::readingSerial()
                     std::cout<<"rb"<<std::endl;
                     setDoDelete(true);
                 }
-                //std::cout<<"colorIdx: "<<colorIdx<<", sizeofcolor: "<<sizeof(colors)<<std::endl;
+
                 if (colorIdx<=17)
                 {
                     setMyColor(colorIdx);
@@ -113,77 +113,5 @@ void SerialReader::readingSerial()
             //this is called when a serial communication error occurs
             qDebug() << "An error occured: " << error;
             //a.quit();
-        });
-
-   /* while(serial.isOpen())
-    {
-        std::cout << __FILE__ <<": "<< __LINE__ << std::endl;
-
-        if(!serial.waitForReadyRead(-1)) //block until new data arrives
-            qDebug() << "error: " << serial.errorString();
-        else{
-           // qDebug() << "New data available: " << serial.bytesAvailable();
-            QByteArray datas = serial.readAll();
-         //   qDebug() << datas;
-
-
-
-            const char* input = datas.data();
-
-            std::cout<<"Processing serial data"<<std::endl;
-
-            if (!strncmp(input, "RM", 2))
-            {
-                point_last.y = point.y;
-                point.y -= 1;
-                std::cout<<"point.y: "<<point.y<<std::endl;
-            }
-            else if (!strncmp(input, "RP",2))
-            {
-                point_last.y = point.y;
-                point.y += 1;
-                std::cout<<"point.y: "<<point.y<<std::endl;
-            }
-            else if (!strncmp(input, "LM",2))
-            {
-                point_last.x = point.x;
-                point.x -= 1;
-                std::cout<<"point.x: "<<point.x<<std::endl;
-            }
-            else if (!strncmp(input, "LP",2))
-            {
-                point_last.x = point.x;
-                point.x += 1;
-                 std::cout<<"point.x: "<<point.x<<std::endl;
-            }
-            else if (!strncmp(input, "BL", 2))
-            {
-                std::cout << "Left button clicked!"<<std::endl;
-            }
-            else if (!strncmp(input, "BR", 2))
-            {
-                std::cout << "Right button clicked!"<<std::endl;
-            }
-
-
-            emit serialIsReady();
-            painter.drawLine(point_last.x, point_last.y, point.x, point.y);
-            if (pointList.size() >= 20)
-            {
-              pointList.pop_front();
-            }
-            pointList.push_back(point_last);
-            if (pointList.size() >= 20)
-            {
-              pointList.pop_front();
-            }
-            pointList.push_back(point);*/
-
-
-
-      /*  }
-
-    }*/
-
-
+        });   
 }
