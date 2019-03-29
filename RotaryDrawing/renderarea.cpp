@@ -26,6 +26,7 @@ QSize RenderArea::minimumSizeHint() const
 
 QSize RenderArea::sizeHint() const
 {
+    //TODO: implement app size based on the screen size: QSize size = qApp->screens()[0]->size();
     return QSize(800, 600);
 }
 

@@ -27,8 +27,6 @@ SerialReader::SerialReader()
     point.x=5;
     point.y=5;
 
-    std::cout << __FILE__ <<": "<< __LINE__ << std::endl;
-
     serial.setPortName("ttyUSB0");
     if(!serial.setBaudRate(QSerialPort::Baud9600))
         qDebug() << serial.errorString();
@@ -43,9 +41,6 @@ SerialReader::SerialReader()
     if(!serial.open(QIODevice::ReadOnly))
         qDebug() << serial.errorString();
     qDebug() << serial.bytesAvailable();
-
-    std::cout << __FILE__ <<": "<< __LINE__ << std::endl;
-
 
 }
 
@@ -67,40 +62,34 @@ void SerialReader::readingSerial()
             {
                 if (datas[i]&8)
                 {
-                    std::cout<<"lm"<<std::endl;
-                    point.x-=1;
+                    point.x-=2;
                 }
                 if (datas[i]&4)
                 {
-                    std::cout<<"lp"<<std::endl;
-                    point.x+=1;
+                    point.x+=2;
                 }
                 if (datas[i]&2)
                 {
-                    std::cout<<"rm"<<std::endl;
-                    point.y-=1;
+                    point.y-=2;
                 }
                 if (datas[i]&1)
                 {
-                    std::cout<<"rp"<<std::endl;
-                    point.y+=1;
+                    point.y+=2;
                 }
                 if (datas[i]&32)
                 {
-                    std::cout<<"lb"<<std::endl;
-                    //myColor = static_cast<Color>(myColor + 1);
                     colorIdx+=1;
                 }
                 if (datas[i]&16)
                 {
-                    std::cout<<"rb"<<std::endl;
                     setDoDelete(true);
                 }
 
                 if (colorIdx<=17)
                 {
                     setMyColor(colorIdx);
-                }else{colorIdx=0;}
+                }
+                else{colorIdx=0;}
 
             }
              emit serialIsReady();
