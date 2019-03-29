@@ -31,12 +31,44 @@ public:
     Points point;
     Points point_last;
     QSerialPort serial;
+    bool doDelete = 0;
     int getPointX(){return this->point.x;}
     int getPointY(){return this->point.y;}
     int getPointLastX(){return this->point_last.x;}
     int getPointLastY(){return this->point_last.y;}
     void setPointX(int iValue){this->point.x = iValue;}
     void setPointY(int iValue){this->point.y = iValue;}
+    bool getDoDelete(){return this->doDelete;}
+    void setDoDelete(bool wdo){this->doDelete = wdo;}
+
+    QColor myColor = Qt::blue;
+
+    int colorIdx = 0;
+
+    void setMyColor(int x)
+    {
+        switch (x)
+        {
+        case 0: this->myColor = Qt::black;       break;
+        case 1: this->myColor = Qt::blue;        break;
+        case 2: this->myColor =  Qt::gray;       break;
+        case 3: this->myColor =  Qt::yellow;     break;
+        case 4: this->myColor =  Qt::red;        break;
+        case 5: this->myColor =  Qt::green;      break;
+        case 6: this->myColor =  Qt::blue;       break;
+        case 7: this->myColor =  Qt::cyan;       break;
+        case 8: this->myColor =  Qt::magenta;    break;
+        case 9: this->myColor =  Qt::yellow;     break;
+        case 10: this->myColor =  Qt::darkRed;    break;
+        case 11: this->myColor =  Qt::darkGreen;  break;
+        case 12: this->myColor =  Qt::darkBlue;   break;
+        case 13: this->myColor =  Qt::darkCyan;   break;
+        case 14: this->myColor =  Qt::darkMagenta;break;
+        case 15: this->myColor =  Qt::darkYellow; break;
+        case 16: this->myColor =  Qt::transparent; break;
+        default: this->myColor =  Qt::blue;       break;
+        }
+    }
 
     void readingSerial();
 signals:

@@ -45,6 +45,7 @@ private:
     QPixmap pixmap;
     SerialReader* serial;
     Points point;
+    Points iniPoint;
     std::vector<Points> pointList;
 };
 

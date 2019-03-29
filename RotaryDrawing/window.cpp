@@ -18,9 +18,9 @@ Window::Window(SerialReader* pserial)
     serial = pserial;
     renderArea->setSerialReader(serial);
 
-    shapeComboBox->addItem(tr("Line"), RenderArea::Line);
+  //  shapeComboBox->addItem(tr("Line"), RenderArea::Line);
 
-    shapeLabel = new QLabel(tr("&Shape:"));
+  /*  shapeLabel = new QLabel(tr("&Shape:"));
     shapeLabel->setBuddy(shapeComboBox);
 
     penWidthSpinBox = new QSpinBox;
@@ -40,7 +40,7 @@ Window::Window(SerialReader* pserial)
 
     penStyleLabel = new QLabel(tr("&Pen Style:"));
     penStyleLabel->setBuddy(penStyleComboBox);
-
+*/
 
 
     otherOptionsLabel = new QLabel(tr("Options:"));
@@ -53,12 +53,12 @@ Window::Window(SerialReader* pserial)
 
    // connect()
 
-    connect(shapeComboBox, SIGNAL(activated(int)),
+  /*  connect(shapeComboBox, SIGNAL(activated(int)),
             this, SLOT(shapeChanged()));
     connect(penWidthSpinBox, SIGNAL(valueChanged(int)),
             this, SLOT(penChanged()));
     connect(penStyleComboBox, SIGNAL(activated(int)),
-            this, SLOT(penChanged()));
+            this, SLOT(penChanged()));*/
 
     connect(antialiasingCheckBox, SIGNAL(toggled(bool)),
             renderArea, SLOT(setAntialiased(bool)));
@@ -69,12 +69,12 @@ Window::Window(SerialReader* pserial)
     mainLayout->setColumnStretch(0, 1);
     mainLayout->setColumnStretch(3, 1);
     mainLayout->addWidget(renderArea, 0, 0, 1, 4);
-    mainLayout->addWidget(shapeLabel, 2, 0, Qt::AlignRight);
+  /*  mainLayout->addWidget(shapeLabel, 2, 0, Qt::AlignRight);
     mainLayout->addWidget(shapeComboBox, 2, 1);
     mainLayout->addWidget(penWidthLabel, 3, 0, Qt::AlignRight);
     mainLayout->addWidget(penWidthSpinBox, 3, 1);
     mainLayout->addWidget(penStyleLabel, 4, 0, Qt::AlignRight);
-    mainLayout->addWidget(penStyleComboBox, 4, 1);
+    mainLayout->addWidget(penStyleComboBox, 4, 1);*/
 
     mainLayout->addWidget(otherOptionsLabel, 5, 0, Qt::AlignRight);
     mainLayout->addWidget(antialiasingCheckBox, 5, 1, 1, 1, Qt::AlignRight);
@@ -98,17 +98,18 @@ void Window::setSerialReader(SerialReader* pserial)
 
 void Window::shapeChanged()
 {
-    RenderArea::Shape shape = RenderArea::Shape(shapeComboBox->itemData(
-            shapeComboBox->currentIndex(), IdRole).toInt());
-    renderArea->setShape(shape);
+    /*RenderArea::Shape shape = RenderArea::Shape(shapeComboBox->itemData(
+            shapeComboBox->currentIndex(), IdRole).toInt());*/
+    renderArea->setShape(RenderArea::Line);
     std::cout<<"shapeChanged is rinning" << std::endl;
 }
 
 void Window::penChanged()
 {
-    int width = penWidthSpinBox->value();
-    Qt::PenStyle style = Qt::PenStyle(penStyleComboBox->itemData(
-            penStyleComboBox->currentIndex(), IdRole).toInt());
-    renderArea->setPen(QPen(Qt::blue, width, style, Qt::FlatCap, Qt::RoundJoin));
+    int width = 2;
+   /* Qt::PenStyle style = Qt::PenStyle(penStyleComboBox->itemData(
+            penStyleComboBox->currentIndex(), IdRole).toInt());*/
+
+    renderArea->setPen(QPen(static_cast<QColor>(serial->myColor), width, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
 }
 

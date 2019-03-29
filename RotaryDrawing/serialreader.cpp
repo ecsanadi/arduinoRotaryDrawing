@@ -85,6 +85,23 @@ void SerialReader::readingSerial()
                     std::cout<<"rp"<<std::endl;
                     point.y+=1;
                 }
+                if (datas[i]&32)
+                {
+                    std::cout<<"lb"<<std::endl;
+                    //myColor = static_cast<Color>(myColor + 1);
+                    colorIdx+=1;
+                }
+                if (datas[i]&16)
+                {
+                    std::cout<<"rb"<<std::endl;
+                    setDoDelete(true);
+                }
+                //std::cout<<"colorIdx: "<<colorIdx<<", sizeofcolor: "<<sizeof(colors)<<std::endl;
+                if (colorIdx<=17)
+                {
+                    setMyColor(colorIdx);
+                }else{colorIdx=0;}
+
             }
              emit serialIsReady();
         });

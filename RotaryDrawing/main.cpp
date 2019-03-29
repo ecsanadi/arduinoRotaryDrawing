@@ -8,15 +8,13 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    SerialReader serialReader;
-     std::cout << __FILE__ <<": "<< __LINE__ << std::endl;
+    SerialReader serialReader;  
 
     Window window(&serialReader);
-     std::cout << __FILE__ <<": "<< __LINE__ << std::endl;
-    //window.setSerialReader(&serialReader);
-     std::cout << __FILE__ <<": "<< __LINE__ << std::endl;
+
     window.show();
+
     serialReader.readingSerial();
-     std::cout << __FILE__ <<": "<< __LINE__ << std::endl;
+
     return app.exec();
 }
