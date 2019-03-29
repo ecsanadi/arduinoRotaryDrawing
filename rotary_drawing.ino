@@ -28,6 +28,13 @@ int rButtonState_last = LOW;
 int counterl =0;
 int counterr =0;
 
+
+
+byte myByte = B00000000;
+
+
+String output;
+
 void setup() {
   pinMode (encoderLPinA, INPUT);
   pinMode (encoderLPinB, INPUT);
@@ -40,34 +47,26 @@ void setup() {
 
 void loop() {
   //Follow rotary states
+  myByte = B00000000;
   l = digitalRead(encoderLPinA);
   r = digitalRead(encoderRPinA);
   if ((encoderLPinALast == LOW) && (l == HIGH)) {
-    if (digitalRead(encoderLPinB) == LOW) {
-      //encoderLPos--;
-      Serial.print ("LM");
-    } else {
-      //encoderLPos++;
-      Serial.print ("LP");
-    }
-    //Serial.print ("L: ");  
-    //Serial.print (encoderLPos);
-    //Serial.print ("\n");
+    if (digitalRead(encoderLPinB) == LOW) {      
+      bitSet(myByte,3);
+    } else {     
+      bitSet(myByte,2);
+    }   
   }
   encoderLPinALast = l;
   if ((encoderRPinALast == LOW) && (r == HIGH)) {
-    if (digitalRead(encoderRPinB) == LOW) {
-      //encoderRPos--;
-      Serial.print ("RM"); 
-    } else {
-      //encoderRPos++;
-      Serial.print ("RP"); 
-    }
-    //Serial.print ("R: ");  
-    //Serial.print (encoderRPos);   
-    //Serial.print ("\n");
+    if (digitalRead(encoderRPinB) == LOW) {     
+      bitSet(myByte,1);
+    } else {    
+      bitSet(myByte, 0);
+    }  
   }
   encoderRPinALast = r;
+ 
   //Check if clicked as push button
   lButtonState = digitalRead(encoderLSw);
   rButtonState = digitalRead(encoderRSw);
@@ -75,25 +74,23 @@ void loop() {
   {
     if (counterl % 2)
     {
-    Serial.print ("BL");
-    //Serial.print (999);
-    //Serial.print ("\n");
+      bitSet(myByte,5);
     }
-    lButtonState_last = lButtonState;
-    
-    counterl++;
-    
-  }/*else{Serial.print (0);}*/
+    lButtonState_last = lButtonState;    
+    counterl++;    
+  }
   if (rButtonState != rButtonState_last)
   {
     if (counterr % 2)
     {
-    Serial.print ("BR");
-    //Serial.print (-999);
-    //Serial.print ("\n");
+      bitSet(myByte,4);
     }
     rButtonState_last = rButtonState;
     counterr++;
-  }/*else{Serial.print (0);}*/
+  }
+  if(myByte != B00000000)
+  {
+    Serial.write(myByte);
+  }
   
 }
