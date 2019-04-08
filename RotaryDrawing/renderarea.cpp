@@ -26,8 +26,14 @@ QSize RenderArea::minimumSizeHint() const
 
 QSize RenderArea::sizeHint() const
 {
-    //TODO: implement app size based on the screen size: QSize size = qApp->screens()[0]->size();
-    return QSize(800, 600);
+    int myHeight = screenSize.height();
+    int myWidth =screenSize.width();
+    myHeight *= 0.9;
+    myWidth *= 0.9;
+//    std::cout << "myHeight: " << myHeight << " , myWidth: " << myWidth << std::endl;
+
+    return QSize(myWidth, myHeight);
+    //return QSize(800, 600);
 }
 
 void RenderArea::setShape(Shape shape)
@@ -70,7 +76,7 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
 
 
     QPainter painter(this);
-    painter.setPen(serial->myColor);
+    //painter.setPen(serial->myColor);
     painter.setBrush(brush);
     if (antialiased)
         painter.setRenderHint(QPainter::Antialiasing, true);
@@ -88,15 +94,17 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
             case Line:
                 if (serial->getDoDelete())
                 {
+                    int lastColorCount = serial->getPointColorCount();
                     pointList.clear();
                     pointList.push_back(iniPoint);
                     serial->setPointX(0);
                     serial->setPointY(0);
+                    serial->setPointColorCount(lastColorCount);
                     serial->setDoDelete(false);
                 }
                 point.x=serial->getPointX();
                 point.y=serial->getPointY();
-                //int n = pointList.size();
+                point.colorCounter=serial->getPointColorCount();
 
                 if (point.x < 0)
                 {
@@ -116,6 +124,10 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                 {
                     serial->setPointY(0);
                 }
+                if (point.colorCounter>=17)
+                {
+                    serial->setPointColorCount(0);
+                }
 
                 pointList.push_back(point);             
                 for(std::vector<Points>::iterator it = pointList.begin(); it != pointList.end(); ++it) {
@@ -126,13 +138,18 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                         it2++;
                         if (it2!=pointList.end())
                         {
+                          serial->setMyColor(it->colorCounter);
+                          painter.setPen(serial->myColor);
                           painter.drawLine(it->x,it->y,it2->x,it2->y);
                         }
                     }else{
                         break;
                     }
 
-                 }          
+                 }
+                int width = 5;
+                painter.setPen(QPen(Qt::black, width, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
+                painter.drawPoint(serial->getPointX(),serial->getPointY());
                 break;
 
             }

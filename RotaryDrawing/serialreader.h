@@ -27,17 +27,18 @@ class SerialReader : public QObject
     Q_OBJECT
 public:
     SerialReader();
-   // ~readSerial(){}
     Points point;
     Points point_last;
     QSerialPort serial;
     bool doDelete = 0;
     int getPointX(){return this->point.x;}
     int getPointY(){return this->point.y;}
+    int getPointColorCount(){return this->point.colorCounter;}
     int getPointLastX(){return this->point_last.x;}
     int getPointLastY(){return this->point_last.y;}
     void setPointX(int iValue){this->point.x = iValue;}
     void setPointY(int iValue){this->point.y = iValue;}
+    void setPointColorCount(int cc){this->point.colorCounter = cc;}
     bool getDoDelete(){return this->doDelete;}
     void setDoDelete(bool wdo){this->doDelete = wdo;}
 
@@ -49,13 +50,13 @@ public:
     {
         switch (x)
         {
-        case 0: this->myColor = Qt::black;       break;
+        case 0: this->myColor = Qt::red;       break;
         case 1: this->myColor = Qt::blue;        break;
         case 2: this->myColor =  Qt::gray;       break;
         case 3: this->myColor =  Qt::yellow;     break;
         case 4: this->myColor =  Qt::red;        break;
         case 5: this->myColor =  Qt::green;      break;
-        case 6: this->myColor =  Qt::blue;       break;
+        case 6: this->myColor =  Qt::black;       break;
         case 7: this->myColor =  Qt::cyan;       break;
         case 8: this->myColor =  Qt::magenta;    break;
         case 9: this->myColor =  Qt::yellow;     break;

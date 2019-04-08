@@ -1,6 +1,5 @@
 #ifndef WINDOW_H
 #define WINDOW_H
-//#include "readserial.h"
 #include <QWidget>
 
 class QCheckBox;
@@ -19,6 +18,7 @@ class Window : public QWidget
 public:
     Window(SerialReader *);
     void setSerialReader(SerialReader *);
+    void setScreenSize(QSize scnsize);
 
 private slots:
     void shapeChanged();

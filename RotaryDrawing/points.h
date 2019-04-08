@@ -8,6 +8,7 @@ public:
     Points();
     int x;
     int y;
+    int colorCounter;
 };
 
 #endif // POINTS_H

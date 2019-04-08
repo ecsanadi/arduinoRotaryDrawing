@@ -20,6 +20,8 @@ public:
 
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
+    QSize screenSize;
+
 
     void setSerialReader(SerialReader *);
 
@@ -32,6 +34,7 @@ public slots:
     void setBrush(const QBrush &brush);
     void setAntialiased(bool antialiased);
     void setTransformed(bool transformed);
+    void setScreenSize(QSize scnsize){this->screenSize = scnsize;}
 
 protected:
     void paintEvent(QPaintEvent *event) override;

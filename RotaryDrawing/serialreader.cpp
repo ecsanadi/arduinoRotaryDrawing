@@ -26,6 +26,7 @@ SerialReader::SerialReader()
     point_last.y=0;
     point.x=5;
     point.y=5;
+    point.colorCounter=0;
 
     serial.setPortName("ttyUSB0");
     if(!serial.setBaudRate(QSerialPort::Baud9600))
@@ -62,34 +63,30 @@ void SerialReader::readingSerial()
             {
                 if (datas[i]&8)
                 {
-                    point.x-=2;
+                    point.x-=1.5;
                 }
                 if (datas[i]&4)
                 {
-                    point.x+=2;
+                    point.x+=1.5;
                 }
                 if (datas[i]&2)
                 {
-                    point.y-=2;
+                    point.y-=1.5;
                 }
                 if (datas[i]&1)
                 {
-                    point.y+=2;
+                    point.y+=1.5;
                 }
                 if (datas[i]&32)
                 {
-                    colorIdx+=1;
+                    point.colorCounter+=1;
                 }
                 if (datas[i]&16)
                 {
                     setDoDelete(true);
                 }
 
-                if (colorIdx<=17)
-                {
-                    setMyColor(colorIdx);
-                }
-                else{colorIdx=0;}
+
 
             }
              emit serialIsReady();

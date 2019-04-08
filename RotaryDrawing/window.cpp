@@ -43,7 +43,8 @@ Window::Window(SerialReader* pserial)
 
     antialiasingCheckBox->setChecked(true);
 
-    setWindowTitle(tr("Basic Drawing"));
+    setWindowTitle(tr("Rotary Drawing"));
+
 }
 
 void Window::setSerialReader(SerialReader* pserial)
@@ -52,11 +53,16 @@ void Window::setSerialReader(SerialReader* pserial)
     renderArea->setSerialReader(serial);
 }
 
+void Window::setScreenSize(QSize scnsize)
+{
+    renderArea->setScreenSize(scnsize);
+}
+
 
 void Window::shapeChanged()
 {
     renderArea->setShape(RenderArea::Line);
-    std::cout<<"shapeChanged is rinning" << std::endl;
+    std::cout<<"shapeChanged is running" << std::endl;
 }
 
 void Window::penChanged()
