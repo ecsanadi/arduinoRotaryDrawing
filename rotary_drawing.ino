@@ -2,7 +2,7 @@
 
 */
 
-//TODO: set as HID if Arduino Leonardo, Micro or Pro Micro (or Due, Zero, M0). Those can emulate a keyboard.
+//TODO: set as HID dev. if Arduino Leonardo, Micro or Pro Micro (or Due, Zero, M0). Those can emulate a keyboard.
 
 // Variables for left control
 int encoderLPinA = 7;
@@ -28,12 +28,11 @@ int rButtonState_last = LOW;
 int counterl =0;
 int counterr =0;
 
-
+double lastMillis = 0;
+double currMillis = 0;
+int interval = 1000;
 
 byte myByte = B00000000;
-
-
-String output;
 
 void setup() {
   pinMode (encoderLPinA, INPUT);
@@ -46,26 +45,59 @@ void setup() {
 }
 
 void loop() {
-  //Follow rotary states
-  myByte = B00000000;
+  //Follow rotary states  
+  currMillis = millis();
   l = digitalRead(encoderLPinA);
   r = digitalRead(encoderRPinA);
   if ((encoderLPinALast == LOW) && (l == HIGH)) {
-    if (digitalRead(encoderLPinB) == LOW) {      
-      bitSet(myByte,3);
+    if (digitalRead(encoderLPinB) == LOW) {
+      encoderLPos-=1;
     } else {     
-      bitSet(myByte,2);
+      encoderLPos+=1;
     }   
   }
   encoderLPinALast = l;
+  
   if ((encoderRPinALast == LOW) && (r == HIGH)) {
-    if (digitalRead(encoderRPinB) == LOW) {     
-      bitSet(myByte,1);
+    if (digitalRead(encoderRPinB) == LOW) {    
+      encoderRPos-=1;
     } else {    
-      bitSet(myByte, 0);
+      encoderRPos+=1;
     }  
   }
   encoderRPinALast = r;
+
+  if ( (currMillis - lastMillis > interval)  
+    && (encoderLPos !=0 || encoderRPos != 0) 
+    || ( abs(encoderLPos) > 62 || abs(encoderRPos) > 62 ) )
+  {
+    //left rotary moving
+    if (encoderLPos != 0 )
+    {      
+      
+      myByte = byte(encoderLPos);      
+      myByte &= 0x7f;  
+      
+      //String myByteStr = String(myByte,BIN);   
+      //Serial.print(myByteStr);
+      Serial.write(myByte);
+      encoderLPos = 0;
+    }    
+    
+    if (encoderRPos != 0)
+    {
+      
+      myByte = byte(encoderRPos);
+      myByte |= 0x80;
+      //myByte = 2;
+      //String myByteStr = String(myByte,BIN);   
+      //Serial.print(myByteStr);
+      Serial.write(myByte);
+      encoderRPos = 0;
+    }       
+    
+    lastMillis = currMillis;
+  }
  
   //Check if clicked as push button
   lButtonState = digitalRead(encoderLSw);
@@ -74,7 +106,8 @@ void loop() {
   {
     if (counterl % 2)
     {
-      bitSet(myByte,5);
+      myByte = B00000000;
+      Serial.write(myByte);
     }
     lButtonState_last = lButtonState;    
     counterl++;    
@@ -83,14 +116,12 @@ void loop() {
   {
     if (counterr % 2)
     {
-      bitSet(myByte,4);
+      myByte = B10000000;
+      Serial.write(myByte);
     }
     rButtonState_last = rButtonState;
     counterr++;
   }
-  if(myByte != B00000000)
-  {
-    Serial.write(myByte);
-  }
+  
   
 }
