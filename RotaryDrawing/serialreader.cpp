@@ -33,6 +33,7 @@ SerialReader::SerialReader()
     QTextStream out(stdout);
 
     const auto serialPortInfos = QSerialPortInfo::availablePorts();
+	QString portName;
 
     std::cout << "Total number of ports available: " << serialPortInfos.count() << std::endl;
 
@@ -42,10 +43,12 @@ SerialReader::SerialReader()
                   out  << "Port: " << serialPortInfo.portName() << endl;
                   out  << "Location: " << serialPortInfo.systemLocation() << endl;
                   out  << "Busy: " << (serialPortInfo.isBusy() ? "Yes" : "No") << endl;
+				  portName = serialPortInfo.portName();
+				  out << "Portname: "<<portName<<endl;
         }
     }
 
-    serial.setPortName("ttyUSB0");
+	serial.setPortName(portName);
     if(!serial.setBaudRate(QSerialPort::Baud9600))
         qDebug() << serial.errorString();
     if(!serial.setDataBits(QSerialPort::Data8))
