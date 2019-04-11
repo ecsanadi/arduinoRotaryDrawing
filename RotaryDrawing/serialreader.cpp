@@ -15,6 +15,8 @@
 #include <QtGui>
 #include <QWidget>
 #include <random>
+#include <QSerialPortInfo>
+#include <QTextStream>
 
 
 
@@ -27,6 +29,21 @@ SerialReader::SerialReader()
     point.x=5;
     point.y=5;
     point.colorCounter=0;
+
+    QTextStream out(stdout);
+
+    const auto serialPortInfos = QSerialPortInfo::availablePorts();
+
+    std::cout << "Total number of ports available: " << serialPortInfos.count() << std::endl;
+
+    if(serialPortInfos.count() > 0)
+    {
+        for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
+                  out  << "Port: " << serialPortInfo.portName() << endl;
+                  out  << "Location: " << serialPortInfo.systemLocation() << endl;
+                  out  << "Busy: " << (serialPortInfo.isBusy() ? "Yes" : "No") << endl;
+        }
+    }
 
     serial.setPortName("ttyUSB0");
     if(!serial.setBaudRate(QSerialPort::Baud9600))

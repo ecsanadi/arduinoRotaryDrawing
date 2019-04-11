@@ -8,11 +8,7 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    //QSize screenSize = app->screens()[0]->size();
-
-    //QSize screenSize = app.screens()[0]->size();
     QSize screenSize = app.desktop()->availableGeometry().size();
-
 
     SerialReader serialReader;  
 
