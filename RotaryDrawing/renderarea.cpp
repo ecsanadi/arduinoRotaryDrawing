@@ -139,7 +139,8 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
                         if (it2!=pointList.end())
                         {
                           serial->setMyColor(it->colorCounter);
-                          painter.setPen(serial->myColor);
+                          int w = 4;
+                          painter.setPen(QPen(static_cast<QColor>(serial->myColor), w, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
                           painter.drawLine(it->x,it->y,it2->x,it2->y);
                         }
                     }else{
@@ -148,7 +149,7 @@ void RenderArea::paintEvent(QPaintEvent * /* event */)
 
                  }
                 int width = 5;
-                painter.setPen(QPen(Qt::black, width, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
+                painter.setPen(QPen(static_cast<QColor>(serial->myColor), width, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
                 painter.drawPoint(serial->getPointX(),serial->getPointY());
                 break;
 

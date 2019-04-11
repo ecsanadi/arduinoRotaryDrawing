@@ -33,7 +33,7 @@ SerialReader::SerialReader()
         qDebug() << serial.errorString();
     if(!serial.setDataBits(QSerialPort::Data8))
         qDebug() << serial.errorString();
-    if(!serial.setParity(QSerialPort::EvenParity))
+    if(!serial.setParity(QSerialPort::NoParity))  //even
         qDebug() << serial.errorString();
     if(!serial.setFlowControl(QSerialPort::HardwareControl))
         qDebug() << serial.errorString();
@@ -56,10 +56,12 @@ void SerialReader::readingSerial()
             //this is called when readyRead() is emitted
             qDebug() << "New data available: " << serial.bytesAvailable();
             int counter = serial.bytesAvailable();
+
             for (int i=0; i<counter;i++)
             {
                 //QByteArray datas = serial.readAll();
                 QByteArray datas = serial.read(1);
+                qDebug() << datas[i];
 
                 char byte_ch[8];
                 if(datas[0] & 1)
@@ -166,7 +168,8 @@ void SerialReader::readingSerial()
 
             }
              emit serialIsReady();
-        });
+        }
+);
         QObject::connect(&serial,
                          static_cast<void(QSerialPort::*)(QSerialPort::SerialPortError)>
                          (&QSerialPort::error),

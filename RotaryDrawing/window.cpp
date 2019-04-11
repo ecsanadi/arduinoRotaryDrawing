@@ -67,7 +67,7 @@ void Window::shapeChanged()
 
 void Window::penChanged()
 {
-    int width = 2;
+    int width = 10;
     renderArea->setPen(QPen(static_cast<QColor>(serial->myColor), width, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
 }
 
