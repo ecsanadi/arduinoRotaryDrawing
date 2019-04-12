@@ -29,10 +29,17 @@ int counterl =0;
 int counterr =0;
 
 double lastMillis = 0;
+double lastMillis2 = 0;
 double currMillis = 0;
-int interval = 1000;
+int interval = 100;
+int interval2 = 1000;
 
 byte myByte = B00000000;
+
+
+byte incomingByte;
+byte detectionByte= 0x20; // " "
+byte outcomingByte= 0x2e;  // "."
 
 void setup() {
   pinMode (encoderLPinA, INPUT);
@@ -45,24 +52,39 @@ void setup() {
 }
 
 void loop() {
-  //Follow rotary states  
   currMillis = millis();
+  //if(currMillis - lastMillis2 > interval2 )
+  //{
+    if (Serial.available()) 
+    {
+      incomingByte = Serial.read();
+      //Serial.print(outcomingByte);
+      
+      if(incomingByte == detectionByte){
+          //Serial.print(".");
+          Serial.write(outcomingByte);
+      }
+      
+    }
+  //  lastMillis2 = currMillis;
+  //}
+  //Follow rotary states    
   l = digitalRead(encoderLPinA);
   r = digitalRead(encoderRPinA);
   if ((encoderLPinALast == LOW) && (l == HIGH)) {
     if (digitalRead(encoderLPinB) == LOW) {
-      encoderLPos-=1;
+      encoderLPos-=3;
     } else {     
-      encoderLPos+=1;
+      encoderLPos+=3;
     }   
   }
   encoderLPinALast = l;
   
   if ((encoderRPinALast == LOW) && (r == HIGH)) {
     if (digitalRead(encoderRPinB) == LOW) {    
-      encoderRPos-=1;
+      encoderRPos-=3;
     } else {    
-      encoderRPos+=1;
+      encoderRPos+=3;
     }  
   }
   encoderRPinALast = r;

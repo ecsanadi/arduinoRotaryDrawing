@@ -17,6 +17,8 @@
 #include <random>
 #include <QSerialPortInfo>
 #include <QTextStream>
+#include <QThread>
+
 
 
 
@@ -30,25 +32,105 @@ SerialReader::SerialReader()
     point.y=5;
     point.colorCounter=0;
 
+    int tryCounter = 50;
+    bool found = 0;
+
     QTextStream out(stdout);
 
-    const auto serialPortInfos = QSerialPortInfo::availablePorts();
 	QString portName;
 
-    std::cout << "Total number of ports available: " << serialPortInfos.count() << std::endl;
 
-    if(serialPortInfos.count() > 0)
+    while (tryCounter && !(found))
     {
-        for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
-                  out  << "Port: " << serialPortInfo.portName() << endl;
-                  out  << "Location: " << serialPortInfo.systemLocation() << endl;
-                  out  << "Busy: " << (serialPortInfo.isBusy() ? "Yes" : "No") << endl;
-				  portName = serialPortInfo.portName();
-				  out << "Portname: "<<portName<<endl;
-        }
-    }
+        const auto serialPortInfos = QSerialPortInfo::availablePorts();
+        std::cout << "Total number of ports available: " << serialPortInfos.count() << std::endl;
 
-	serial.setPortName(portName);
+        /*if(serialPortInfos.count() == 1)
+        {
+            for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
+                      out  << "Port: " << serialPortInfo.portName() << endl;
+                      out  << "Location: " << serialPortInfo.systemLocation() << endl;
+                      out  << "Busy: " << (serialPortInfo.isBusy() ? "Yes" : "No") << endl;
+                      portName = serialPortInfo.portName();
+                      out << "Portname: "<<portName<<endl;
+            }
+
+            break;
+        }*/
+
+        if(serialPortInfos.count() >= 1)
+        {
+            //TODO: it will be mac OS..
+            for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
+                      portName = serialPortInfo.portName();
+                      out << "Portname: "<<portName<<endl;
+
+                        serial.setPortName(portName);
+                        if(!serial.setBaudRate(QSerialPort::Baud9600))
+                            qDebug() << serial.errorString();
+                        if(!serial.setDataBits(QSerialPort::Data8))
+                            qDebug() << serial.errorString();
+                        if(!serial.setParity(QSerialPort::NoParity))  //even
+                            qDebug() << serial.errorString();
+                        if(!serial.setFlowControl(QSerialPort::HardwareControl))
+                            qDebug() << serial.errorString();
+                        if(!serial.setStopBits(QSerialPort::OneStop))
+                            qDebug() << serial.errorString();
+                        if(!serial.open(QIODevice::ReadWrite))
+                            qDebug() << serial.errorString();
+                         qDebug() << serial.bytesAvailable();
+                             QByteArray datastrash = serial.readAll();
+                             qDebug()<<datastrash;
+                       for (int loop=0;loop<3;loop++)
+                       {
+                        if(serial.isWritable())
+                        {
+                            QByteArray output;
+                            QByteArray input;
+
+                            output = " ";
+                            serial.write(output);
+                            serial.flush();
+
+                            serial.waitForBytesWritten(1000);
+                            serial.waitForReadyRead(1000);
+
+                            input = serial.readAll();
+                            qDebug()<<input;
+
+                            if(input==".")
+                            {
+                                std::cout<<"EQUAL"<<std::endl;
+                                found = true;
+                                serial.close();
+                                break;
+                            }
+                            else
+                            {
+                                std::cout<<"Try next port..."<<std::endl;
+                            }
+                        }
+                       }
+                      if(found)
+                      {
+                          break;
+                      }
+             }
+
+        }
+
+        tryCounter--;
+
+    }
+    if(tryCounter == 0)
+    {
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","No USB connection!");
+        messageBox.setFixedSize(500,200);
+        exit(1);
+    }
+    std::cout<<"SUCCESS Connection!"<<std::endl;
+    serial.setPortName(portName);
     if(!serial.setBaudRate(QSerialPort::Baud9600))
         qDebug() << serial.errorString();
     if(!serial.setDataBits(QSerialPort::Data8))
@@ -62,6 +144,7 @@ SerialReader::SerialReader()
     if(!serial.open(QIODevice::ReadOnly))
         qDebug() << serial.errorString();
     qDebug() << serial.bytesAvailable();
+
 
 }
 
