@@ -20,7 +20,7 @@
 #include <QThread>
 
 
-
+QTextStream out(stdout);
 
 
 SerialReader::SerialReader()
@@ -32,9 +32,10 @@ SerialReader::SerialReader()
     point.colorCounter=0;
 
     int tryCounter = 50;
+    int portcounter = 0;
     bool found = 0;
 
-    QTextStream out(stdout);
+
 	QString portName;
 
     //Try (max 50 times) to find available serial ports
@@ -42,26 +43,32 @@ SerialReader::SerialReader()
     {
         const auto serialPortInfos = QSerialPortInfo::availablePorts();
         std::cout << "Total number of ports available: " << serialPortInfos.count() << std::endl;
+
         //if success iterate trough
         if(serialPortInfos.count() >= 1)
         {
             tryCounter = 1;
             for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
                       portName = serialPortInfo.portName();
-                      out << "Portname: "<<portName<<endl;
-
+                      out << "Try to set "<<portcounter<<". port, named: "<<portName<<endl;
+                      portcounter++;
+                      out<<"Call setSerialDevice("<<portName<<")"<<endl;
                       if(setSerialDevice(portName))
                       {
+                          out << "setSerialDevice("<<portName<<") was SUCCESS."<<endl;
                           found = checkSerialDevice();
+                          out << "found is "<<found<<endl;
                       }
 
                       if(!found)
                       {
                           serial.close();
+                          out<<"Close serial and try next."<<endl;
                           continue;
                       }
                       else
                       {
+                          out<<"Device is found, break from for."<<endl;
                           break;
                       }
 
@@ -147,6 +154,7 @@ void SerialReader::readingSerial()
 
 bool SerialReader::setSerialDevice(QString portName)
 {
+
     this->serial.setPortName(portName);
     if(!this->serial.setBaudRate(QSerialPort::Baud9600))
         qDebug() << this->serial.errorString();
@@ -161,24 +169,29 @@ bool SerialReader::setSerialDevice(QString portName)
     if(!this->serial.open(QIODevice::ReadWrite))
     {
         qDebug() << this->serial.errorString();
+        out<<"Set " << portName << " was NOT success."<<endl;
         return false;
     }
      qDebug() << this->serial.bytesAvailable();
          QByteArray datastrash = this->serial.readAll();
-     qDebug()<<datastrash;
+     //qDebug()<<datastrash<<"was sent to a trash var.";
+     out<<"first read is deleted: "<<datastrash<<endl;
+     out<<"Set " << portName << " was SUCCESS."<<endl;
      return true;
 }
 
 bool SerialReader::checkSerialDevice()
 {
+    out<<"Checking if this device is the Arduino..."<<endl;
     for (int loop=0;loop<4;loop++)
     {
+     out<<loop<<". try: "<<endl;
      if(serial.isWritable())
      {
          QByteArray output;
          QByteArray input;
 
-         //send a space character
+         out<<"Send a space."<<endl;
          output = " ";
          this->serial.write(output);
          this->serial.flush();
@@ -186,21 +199,25 @@ bool SerialReader::checkSerialDevice()
          this->serial.waitForBytesWritten(1000);
          this->serial.waitForReadyRead(1000);
 
+
          input = this->serial.readAll();
-         qDebug()<<input;
+         //qDebug()<<input;
+         out<<"receive input is: \""<<input<<"\""<<endl;
+
 
          //check if the received char is a dot
          if(input==".")
          {
-             std::cout<<"EQUAL"<<std::endl;
+             std::cout<<"Received data is EQUAL, returning true.."<<std::endl;
              return true;
          }
          else
          {
-             std::cout<<"Try next port..."<<std::endl;
+             std::cout<<"Received data was NOT EQUAL. Try again..."<<std::endl;
          }
      }
     }
+    out<<"Device detection was not success. Try next port..."<<endl;
     return false;
 }
 
