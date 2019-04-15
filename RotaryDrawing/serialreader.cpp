@@ -45,92 +45,41 @@ SerialReader::SerialReader()
         //if success iterate trough
         if(serialPortInfos.count() >= 1)
         {
+            tryCounter = 1;
             for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
                       portName = serialPortInfo.portName();
                       out << "Portname: "<<portName<<endl;
 
-                        serial.setPortName(portName);
-                        if(!serial.setBaudRate(QSerialPort::Baud9600))
-                            qDebug() << serial.errorString();
-                        if(!serial.setDataBits(QSerialPort::Data8))
-                            qDebug() << serial.errorString();
-                        if(!serial.setParity(QSerialPort::NoParity))  //even
-                            qDebug() << serial.errorString();
-                        if(!serial.setFlowControl(QSerialPort::HardwareControl))
-                            qDebug() << serial.errorString();
-                        if(!serial.setStopBits(QSerialPort::OneStop))
-                            qDebug() << serial.errorString();
-                        if(!serial.open(QIODevice::ReadWrite))
-                            qDebug() << serial.errorString();
-                         qDebug() << serial.bytesAvailable();
-                             QByteArray datastrash = serial.readAll();
-                             qDebug()<<datastrash;
-                       //try to communicate two times: in case if first time we would get junk data
-                       for (int loop=0;loop<3;loop++)
-                       {
-                        if(serial.isWritable())
-                        {
-                            QByteArray output;
-                            QByteArray input;
+                      if(setSerialDevice(portName))
+                      {
+                          found = checkSerialDevice();
+                      }
 
-                            //send a space character
-                            output = " ";
-                            serial.write(output);
-                            serial.flush();
-
-                            serial.waitForBytesWritten(1000);
-                            serial.waitForReadyRead(1000);
-
-                            input = serial.readAll();
-                            qDebug()<<input;
-
-                            //check if the received char is a dot
-                            if(input==".")
-                            {
-                                std::cout<<"EQUAL"<<std::endl;
-                                found = true;
-                                serial.close();
-                                break;
-                            }
-                            else
-                            {
-                                std::cout<<"Try next port..."<<std::endl;
-                            }
-                        }
-                       }
-                      if(found)
+                      if(!found)
+                      {
+                          serial.close();
+                          continue;
+                      }
+                      else
                       {
                           break;
                       }
+
              }
             //found
         }
         tryCounter--;
     }
-    if(tryCounter == 0)
+
+    if(tryCounter == 0 && !(found))
     {
         QMessageBox messageBox;
         messageBox.critical(0,"Error","No USB connection!");
         messageBox.setFixedSize(500,200);
         exit(1);
     }
+
     std::cout<<"SUCCESS Connection!"<<std::endl;
-    serial.setPortName(portName);
-    if(!serial.setBaudRate(QSerialPort::Baud9600))
-        qDebug() << serial.errorString();
-    if(!serial.setDataBits(QSerialPort::Data8))
-        qDebug() << serial.errorString();
-    if(!serial.setParity(QSerialPort::NoParity))  //even
-        qDebug() << serial.errorString();
-    if(!serial.setFlowControl(QSerialPort::HardwareControl))
-        qDebug() << serial.errorString();
-    if(!serial.setStopBits(QSerialPort::OneStop))
-        qDebug() << serial.errorString();
-    if(!serial.open(QIODevice::ReadOnly))
-        qDebug() << serial.errorString();
-    qDebug() << serial.bytesAvailable();
-
-
 }
 
 
@@ -195,3 +144,64 @@ void SerialReader::readingSerial()
             qDebug() << "An error occured: " << error;
         });   
 }
+
+bool SerialReader::setSerialDevice(QString portName)
+{
+    this->serial.setPortName(portName);
+    if(!this->serial.setBaudRate(QSerialPort::Baud9600))
+        qDebug() << this->serial.errorString();
+    if(!this->serial.setDataBits(QSerialPort::Data8))
+        qDebug() << this->serial.errorString();
+    if(!this->serial.setParity(QSerialPort::NoParity))  //even
+        qDebug() << this->serial.errorString();
+    if(!this->serial.setFlowControl(QSerialPort::HardwareControl))
+        qDebug() << this->serial.errorString();
+    if(!this->serial.setStopBits(QSerialPort::OneStop))
+        qDebug() << this->serial.errorString();
+    if(!this->serial.open(QIODevice::ReadWrite))
+    {
+        qDebug() << this->serial.errorString();
+        return false;
+    }
+     qDebug() << this->serial.bytesAvailable();
+         QByteArray datastrash = this->serial.readAll();
+     qDebug()<<datastrash;
+     return true;
+}
+
+bool SerialReader::checkSerialDevice()
+{
+    for (int loop=0;loop<4;loop++)
+    {
+     if(serial.isWritable())
+     {
+         QByteArray output;
+         QByteArray input;
+
+         //send a space character
+         output = " ";
+         this->serial.write(output);
+         this->serial.flush();
+
+         this->serial.waitForBytesWritten(1000);
+         this->serial.waitForReadyRead(1000);
+
+         input = this->serial.readAll();
+         qDebug()<<input;
+
+         //check if the received char is a dot
+         if(input==".")
+         {
+             std::cout<<"EQUAL"<<std::endl;
+             return true;
+         }
+         else
+         {
+             std::cout<<"Try next port..."<<std::endl;
+         }
+     }
+    }
+    return false;
+}
+
+

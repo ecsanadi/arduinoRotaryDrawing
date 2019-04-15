@@ -41,6 +41,9 @@ public:
     void setPointColorCount(int cc){this->point.colorCounter = cc;}
     bool getDoDelete(){return this->doDelete;}
     void setDoDelete(bool wdo){this->doDelete = wdo;}
+    bool setSerialDevice(QString portName);
+    bool checkSerialDevice();
+
 
     QColor myColor = Qt::blue;
 
