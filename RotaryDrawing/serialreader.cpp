@@ -53,11 +53,16 @@ SerialReader::SerialReader()
                       out << "Try to set "<<portcounter<<". port, named: "<<portName<<endl;
                       portcounter++;
                       out<<"Call setSerialDevice("<<portName<<")"<<endl;
+
                       if(setSerialDevice(portName))
                       {
                           out << "setSerialDevice("<<portName<<") was SUCCESS."<<endl;
                           found = checkSerialDevice();
                           out << "found is "<<found<<endl;
+                      }
+                      else
+                      {
+                          serial.close();
                       }
 
                       if(!found)
@@ -173,8 +178,7 @@ bool SerialReader::setSerialDevice(QString portName)
         return false;
     }
      qDebug() << this->serial.bytesAvailable();
-         QByteArray datastrash = this->serial.readAll();
-     //qDebug()<<datastrash<<"was sent to a trash var.";
+     QByteArray datastrash = this->serial.readAll();
      out<<"first read is deleted: "<<datastrash<<endl;
      out<<"Set " << portName << " was SUCCESS."<<endl;
      return true;
@@ -185,6 +189,7 @@ bool SerialReader::checkSerialDevice()
     out<<"Checking if this device is the Arduino..."<<endl;
     for (int loop=0;loop<4;loop++)
     {
+     this->serial.waitForReadyRead(1000);
      out<<loop<<". try: "<<endl;
      if(serial.isWritable())
      {
@@ -201,7 +206,6 @@ bool SerialReader::checkSerialDevice()
 
 
          input = this->serial.readAll();
-         //qDebug()<<input;
          out<<"receive input is: \""<<input<<"\""<<endl;
 
 
