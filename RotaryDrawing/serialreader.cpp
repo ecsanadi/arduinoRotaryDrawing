@@ -167,7 +167,7 @@ bool SerialReader::setSerialDevice(QString portName)
         qDebug() << this->serial.errorString();
     if(!this->serial.setParity(QSerialPort::NoParity))  //even
         qDebug() << this->serial.errorString();
-    if(!this->serial.setFlowControl(QSerialPort::HardwareControl))
+	if(!this->serial.setFlowControl(QSerialPort::NoFlowControl))
         qDebug() << this->serial.errorString();
     if(!this->serial.setStopBits(QSerialPort::OneStop))
         qDebug() << this->serial.errorString();
@@ -187,26 +187,26 @@ bool SerialReader::setSerialDevice(QString portName)
 bool SerialReader::checkSerialDevice()
 {
     out<<"Checking if this device is the Arduino..."<<endl;
-    for (int loop=0;loop<4;loop++)
+	for (int loop=0;loop<4;loop++)
     {
-     this->serial.waitForReadyRead(1000);
+	 this->serial.waitForReadyRead(1500);
      out<<loop<<". try: "<<endl;
      if(serial.isWritable())
      {
-         QByteArray output;
+		 QByteArray output;
          QByteArray input;
 
-         out<<"Send a space."<<endl;
-         output = " ";
-         this->serial.write(output);
+		 out<<"Send a space."<<endl;
+		 output = " ";
+		 this->serial.write(output);
          this->serial.flush();
 
-         this->serial.waitForBytesWritten(1000);
-         this->serial.waitForReadyRead(1000);
+		 this->serial.waitForBytesWritten(1000);
+		 this->serial.waitForReadyRead(1000);
 
 
-         input = this->serial.readAll();
-         out<<"receive input is: \""<<input<<"\""<<endl;
+		 input = this->serial.readAll();
+		 out<<"received input is: \""<<input<<"\""<<endl;
 
 
          //check if the received char is a dot
