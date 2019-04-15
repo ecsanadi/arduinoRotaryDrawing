@@ -1,8 +1,6 @@
 /*
-
+This program counts the output of two rotary encoder and sends the result into serial port using one byte.
 */
-
-//TODO: set as HID dev. if Arduino Leonardo, Micro or Pro Micro (or Due, Zero, M0). Those can emulate a keyboard.
 
 // Variables for left control
 int encoderLPinA = 7;
@@ -25,20 +23,23 @@ int rButtonState = LOW;
 int lButtonState_last = LOW;
 int rButtonState_last = LOW;
 
+//counters for avoid push button state duplication
 int counterl =0;
 int counterr =0;
 
+//time measuring
+double currMillis = 0;
 double lastMillis = 0;
 double lastMillis2 = 0;
-double currMillis = 0;
 int interval = 100;
 int interval2 = 1000;
 
+//output
 byte myByte = B00000000;
 
-
-byte incomingByte;
-byte detectionByte= 0x20; // " "
+//testing port and connection
+byte incomingByte;         // should be: " "
+byte detectionByte= 0x20;  // " "
 byte outcomingByte= 0x2e;  // "."
 
 void setup() {
@@ -52,23 +53,20 @@ void setup() {
 }
 
 void loop() {
-  currMillis = millis();
-  //if(currMillis - lastMillis2 > interval2 )
-  //{
-    if (Serial.available()) 
-    {
-      incomingByte = Serial.read();
-      //Serial.print(outcomingByte);
-      
-      if(incomingByte == detectionByte){
-          //Serial.print(".");
-          Serial.write(outcomingByte);
-      }
-      
-    }
-  //  lastMillis2 = currMillis;
-  //}
+  //save the current time
+  currMillis = millis();  
+
+  //answer for the query if needed
+  if (Serial.available()) 
+  {
+    incomingByte = Serial.read();
+    if(incomingByte == detectionByte){
+      Serial.write(outcomingByte);
+    }      
+  }
+  
   //Follow rotary states    
+  // Left
   l = digitalRead(encoderLPinA);
   r = digitalRead(encoderRPinA);
   if ((encoderLPinALast == LOW) && (l == HIGH)) {
@@ -79,7 +77,7 @@ void loop() {
     }   
   }
   encoderLPinALast = l;
-  
+  // Right
   if ((encoderRPinALast == LOW) && (r == HIGH)) {
     if (digitalRead(encoderRPinB) == LOW) {    
       encoderRPos-=3;
@@ -89,41 +87,35 @@ void loop() {
   }
   encoderRPinALast = r;
 
+  //send data if reach time or size
   if ( (currMillis - lastMillis > interval)  
     && (encoderLPos !=0 || encoderRPos != 0) 
     || ( abs(encoderLPos) > 62 || abs(encoderRPos) > 62 ) )
   {
-    //left rotary moving
+    //send left rotary moving
     if (encoderLPos != 0 )
-    {      
-      
+    {            
       myByte = byte(encoderLPos);      
       myByte &= 0x7f;  
-      
-      //String myByteStr = String(myByte,BIN);   
-      //Serial.print(myByteStr);
       Serial.write(myByte);
       encoderLPos = 0;
     }    
-    
+    //send right rotary moving
     if (encoderRPos != 0)
-    {
-      
+    {      
       myByte = byte(encoderRPos);
       myByte |= 0x80;
-      //myByte = 2;
-      //String myByteStr = String(myByte,BIN);   
-      //Serial.print(myByteStr);
       Serial.write(myByte);
       encoderRPos = 0;
-    }       
-    
+    }      
+    //set back time counter  
     lastMillis = currMillis;
   }
  
   //Check if clicked as push button
   lButtonState = digitalRead(encoderLSw);
   rButtonState = digitalRead(encoderRSw);
+  //Left
   if (lButtonState != lButtonState_last)
   {
     if (counterl % 2)
@@ -134,6 +126,7 @@ void loop() {
     lButtonState_last = lButtonState;    
     counterl++;    
   }
+  //Right
   if (rButtonState != rButtonState_last)
   {
     if (counterr % 2)
@@ -143,7 +136,5 @@ void loop() {
     }
     rButtonState_last = rButtonState;
     counterr++;
-  }
-  
-  
+  }  
 }

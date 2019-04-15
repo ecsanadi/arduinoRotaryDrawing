@@ -26,8 +26,7 @@
 SerialReader::SerialReader()
 {
 
-    point_last.x=0;
-    point_last.y=0;
+    //set start position and color
     point.x=5;
     point.y=5;
     point.colorCounter=0;
@@ -36,31 +35,16 @@ SerialReader::SerialReader()
     bool found = 0;
 
     QTextStream out(stdout);
-
 	QString portName;
 
-
+    //Try (max 50 times) to find available serial ports
     while (tryCounter && !(found))
     {
         const auto serialPortInfos = QSerialPortInfo::availablePorts();
         std::cout << "Total number of ports available: " << serialPortInfos.count() << std::endl;
-
-        /*if(serialPortInfos.count() == 1)
-        {
-            for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
-                      out  << "Port: " << serialPortInfo.portName() << endl;
-                      out  << "Location: " << serialPortInfo.systemLocation() << endl;
-                      out  << "Busy: " << (serialPortInfo.isBusy() ? "Yes" : "No") << endl;
-                      portName = serialPortInfo.portName();
-                      out << "Portname: "<<portName<<endl;
-            }
-
-            break;
-        }*/
-
+        //if success iterate trough
         if(serialPortInfos.count() >= 1)
         {
-            //TODO: it will be mac OS..
             for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
                       portName = serialPortInfo.portName();
                       out << "Portname: "<<portName<<endl;
@@ -81,6 +65,7 @@ SerialReader::SerialReader()
                          qDebug() << serial.bytesAvailable();
                              QByteArray datastrash = serial.readAll();
                              qDebug()<<datastrash;
+                       //try to communicate two times: in case if first time we would get junk data
                        for (int loop=0;loop<3;loop++)
                        {
                         if(serial.isWritable())
@@ -88,6 +73,7 @@ SerialReader::SerialReader()
                             QByteArray output;
                             QByteArray input;
 
+                            //send a space character
                             output = " ";
                             serial.write(output);
                             serial.flush();
@@ -98,6 +84,7 @@ SerialReader::SerialReader()
                             input = serial.readAll();
                             qDebug()<<input;
 
+                            //check if the received char is a dot
                             if(input==".")
                             {
                                 std::cout<<"EQUAL"<<std::endl;
@@ -116,11 +103,9 @@ SerialReader::SerialReader()
                           break;
                       }
              }
-
+            //found
         }
-
         tryCounter--;
-
     }
     if(tryCounter == 0)
     {
@@ -164,80 +149,9 @@ void SerialReader::readingSerial()
             {
                 //QByteArray datas = serial.readAll();
                 QByteArray datas = serial.read(1);
-                qDebug() << datas[i];
+                qDebug() << datas[i];                
 
-                char byte_ch[8];
-                if(datas[0] & 1)
-                {
-                    byte_ch[7]='1';
-                }
-                else
-                {
-                    byte_ch[7]='0';
-                }
-                if(datas[0] & 2)
-                {
-                    byte_ch[6]='1';
-                }
-                else
-                {
-                    byte_ch[6]='0';
-                }
-                if(datas[0] & 4)
-                {
-                    byte_ch[5]='1';
-                }
-                else
-                {
-                    byte_ch[5]='0';
-                }
-                if(datas[0] & 8)
-                {
-                    byte_ch[4]='1';
-                }
-                else
-                {
-                    byte_ch[4]='0';
-                }
-                if(datas[0] & 16)
-                {
-                    byte_ch[3]='1';
-                }
-                else
-                {
-                    byte_ch[3]='0';
-                }
-                if(datas[0] & 32)
-                {
-                    byte_ch[2]='1';
-                }
-                else
-                {
-                    byte_ch[2]='0';
-                }
-                if(datas[0] & 64)
-                {
-                    byte_ch[1]='1';
-                }
-                else
-                {
-                    byte_ch[1]='0';
-                }
-                if(datas[0] & 128)
-                {
-                    byte_ch[0]='1';
-                }
-                else
-                {
-                    byte_ch[0]='0';
-                }
-
-                for (int j=0; j<8; j++)
-                {
-                    std::cout << "byte_ch[" << j << "]: "<<byte_ch[j]<<std::endl;
-                }
-                std::cout << "" <<std::endl;
-
+                //if the first bit is 1 then right rotary data came
                 if (datas[0]&128)
                 {
                     std::cout<<"RIGHT"<<std::endl;
@@ -251,8 +165,8 @@ void SerialReader::readingSerial()
                     {
                         point.y+=value;
                     }
-
                 }
+                //left..
                 else
                 {
                     std::cout<<"LEFT"<<std::endl;
@@ -266,10 +180,9 @@ void SerialReader::readingSerial()
                     {
                         point.x+=value;
                     }
-
                 }
-
             }
+            //emit serial reading
              emit serialIsReady();
         }
 );
@@ -280,6 +193,5 @@ void SerialReader::readingSerial()
         {
             //this is called when a serial communication error occurs
             qDebug() << "An error occured: " << error;
-            //a.quit();
         });   
 }
