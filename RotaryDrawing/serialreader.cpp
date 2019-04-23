@@ -1,27 +1,8 @@
 #include "serialreader.h"
-#include <QtCore/QCoreApplication>
-#include <iostream>
-#include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
-#include <QString>
 #include <QDebug>
-#include <QtSerialPort/QtSerialPort>
-#include <string>
-#include <QPainter>
-#include <QtWidgets>
-#include <iterator>
-#include <vector>
-#include <list>
-#include <QtGui>
-#include <QWidget>
-#include <random>
-#include <QSerialPortInfo>
-#include <QTextStream>
-#include <QThread>
-
 
 QTextStream out(stdout);
-
 
 SerialReader::SerialReader()
 {
@@ -32,9 +13,8 @@ SerialReader::SerialReader()
     point.colorCounter=0;
 
     int tryCounter = 50;
-    int portcounter = 0;
+    int portcounter = 1;
     bool found = 0;
-
 
 	QString portName;
 
@@ -50,15 +30,13 @@ SerialReader::SerialReader()
             tryCounter = 1;
             for (const QSerialPortInfo &serialPortInfo : serialPortInfos) {
                       portName = serialPortInfo.portName();
-                      out << "Try to set "<<portcounter<<". port, named: "<<portName<<endl;
-                      portcounter++;
-                      out<<"Call setSerialDevice("<<portName<<")"<<endl;
+                      out << "Try to set " << portcounter << ". port, named: " << portName << endl;
+                      portcounter++;                      
 
                       if(setSerialDevice(portName))
                       {
-                          out << "setSerialDevice("<<portName<<") was SUCCESS."<<endl;
+                          out << "setSerialDevice(" << portName<< ") was SUCCESS." << endl;
                           found = checkSerialDevice();
-                          out << "found is "<<found<<endl;
                       }
                       else
                       {
@@ -73,7 +51,6 @@ SerialReader::SerialReader()
                       }
                       else
                       {
-                          out<<"Device is found, break from for."<<endl;
                           break;
                       }
 
@@ -103,14 +80,10 @@ void SerialReader::readingSerial()
     QObject::connect(&serial, &QSerialPort::readyRead, [&]
         {
             //this is called when readyRead() is emitted
-            qDebug() << "New data available: " << serial.bytesAvailable();
             int counter = serial.bytesAvailable();
-
             for (int i=0; i<counter;i++)
             {
-                //QByteArray datas = serial.readAll();
-                QByteArray datas = serial.read(1);
-                qDebug() << datas[i];                
+                QByteArray datas = serial.read(1);                             
 
                 //if the first bit is 1 then right rotary data came
                 if (datas[0]&128)
@@ -127,6 +100,7 @@ void SerialReader::readingSerial()
                         point.y+=value;
                     }
                 }
+
                 //left..
                 else
                 {
@@ -176,11 +150,8 @@ bool SerialReader::setSerialDevice(QString portName)
         qDebug() << this->serial.errorString();
         out<<"Set " << portName << " was NOT success."<<endl;
         return false;
-    }
-     qDebug() << this->serial.bytesAvailable();
-     QByteArray datastrash = this->serial.readAll();
-     out<<"first read is deleted: "<<datastrash<<endl;
-     out<<"Set " << portName << " was SUCCESS."<<endl;
+    }     
+     QByteArray datastrash = this->serial.readAll();     
      return true;
 }
 
@@ -190,20 +161,18 @@ bool SerialReader::checkSerialDevice()
 	for (int loop=0;loop<4;loop++)
     {
 	 this->serial.waitForReadyRead(1500);
-     out<<loop<<". try: "<<endl;
+     out << loop+1 << ". try: " << endl;
      if(serial.isWritable())
      {
 		 QByteArray output;
          QByteArray input;
 
-		 out<<"Send a space."<<endl;
 		 output = " ";
 		 this->serial.write(output);
          this->serial.flush();
 
 		 this->serial.waitForBytesWritten(1000);
 		 this->serial.waitForReadyRead(1000);
-
 
 		 input = this->serial.readAll();
 		 out<<"received input is: \""<<input<<"\""<<endl;
@@ -225,4 +194,27 @@ bool SerialReader::checkSerialDevice()
     return false;
 }
 
-
+void SerialReader::setMyColor(int x)
+{
+    switch (x)
+    {
+    case 0: this->myColor = Qt::red;       break;
+    case 1: this->myColor = Qt::blue;        break;
+    case 2: this->myColor =  Qt::gray;       break;
+    case 3: this->myColor =  Qt::yellow;     break;
+    case 4: this->myColor =  Qt::red;        break;
+    case 5: this->myColor =  Qt::green;      break;
+    case 6: this->myColor =  Qt::black;       break;
+    case 7: this->myColor =  Qt::cyan;       break;
+    case 8: this->myColor =  Qt::magenta;    break;
+    case 9: this->myColor =  Qt::yellow;     break;
+    case 10: this->myColor =  Qt::darkRed;    break;
+    case 11: this->myColor =  Qt::darkGreen;  break;
+    case 12: this->myColor =  Qt::darkBlue;   break;
+    case 13: this->myColor =  Qt::darkCyan;   break;
+    case 14: this->myColor =  Qt::darkMagenta;break;
+    case 15: this->myColor =  Qt::darkYellow; break;
+    case 16: this->myColor =  Qt::transparent; break;
+    default: this->myColor =  Qt::blue;       break;
+    }
+}

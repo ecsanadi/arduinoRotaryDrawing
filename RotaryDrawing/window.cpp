@@ -62,12 +62,11 @@ void Window::setScreenSize(QSize scnsize)
 void Window::shapeChanged()
 {
     renderArea->setShape(RenderArea::Line);
-    std::cout<<"shapeChanged is running" << std::endl;
 }
 
 void Window::penChanged()
 {
-    int width = 10;
-    renderArea->setPen(QPen(static_cast<QColor>(serial->myColor), width, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
+    int penWidth = 10;
+    renderArea->setPen(QPen(static_cast<QColor>(serial->getMyColor()), penWidth, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
 }
 

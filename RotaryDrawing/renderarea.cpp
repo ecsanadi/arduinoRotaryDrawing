@@ -28,12 +28,7 @@ QSize RenderArea::sizeHint() const
 {
     int myHeight = screenSize.height();
     int myWidth =screenSize.width();
-    myHeight *= 0.9;
-    myWidth *= 0.9;
-//    std::cout << "myHeight: " << myHeight << " , myWidth: " << myWidth << std::endl;
-
     return QSize(myWidth, myHeight);
-    //return QSize(800, 600);
 }
 
 void RenderArea::setShape(Shape shape)
@@ -73,89 +68,84 @@ void RenderArea::setSerialReader(SerialReader* pserial)
 
 void RenderArea::paintEvent(QPaintEvent * /* event */)
 {
-
-
     QPainter painter(this);
-    //painter.setPen(serial->myColor);
     painter.setBrush(brush);
     if (antialiased)
         painter.setRenderHint(QPainter::Antialiasing, true);
 
-            painter.save();
+    painter.save();
 
-            if (transformed) {
-                painter.translate(50, 50);
-                painter.rotate(60.0);
-                painter.scale(0.6, 0.9);
-                painter.translate(-50, -50);
+    if (transformed) {
+        painter.translate(50, 50);
+        painter.rotate(60.0);
+        painter.scale(0.6, 0.9);
+        painter.translate(-50, -50);
+    }
+
+    if (serial->getDoDelete())
+    {
+        int lastColorCount = serial->getPointColorCount();
+        pointList.clear();
+        serial->setPointX(0);
+        serial->setPointY(0);
+        serial->setPointColorCount(lastColorCount);
+        serial->setDoDelete(false);
+    }
+    point.x=serial->getPointX();
+    point.y=serial->getPointY();
+    point.colorCounter=serial->getPointColorCount();
+
+    //keep drawing inside of the window
+    if (point.x < 0)
+    {
+        serial->setPointX(0);
+    }
+    if (point.x > width())
+    {
+        serial->setPointX(width());
+    }
+
+   if (point.y > height())
+    {
+        serial->setPointY(height());
+    }
+    if (point.y < 0)
+    {
+        serial->setPointY(0);
+    }
+
+    //restart color counter if the end is reached
+    if (point.colorCounter>=17)
+    {
+        serial->setPointColorCount(0);
+    }
+
+    //save into a vector and draw each point
+    pointList.push_back(point);
+    for(std::vector<Points>::iterator it = pointList.begin(); it != pointList.end(); ++it) {
+        if (it != pointList.end())
+        {
+            std::vector<Points>::iterator it2 = it;
+            it2++;
+            if (it2!=pointList.end())
+            {
+              serial->setMyColor(it->colorCounter);
+              int w = 4;
+              painter.setPen(QPen(static_cast<QColor>(serial->getMyColor()), w, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
+              painter.drawLine(it->x,it->y,it2->x,it2->y);
             }
+        }else{
+            break;
+        }
+    }
 
-            switch (shape) {
-            case Line:
-                if (serial->getDoDelete())
-                {
-                    int lastColorCount = serial->getPointColorCount();
-                    pointList.clear();
-                    pointList.push_back(iniPoint);
-                    serial->setPointX(0);
-                    serial->setPointY(0);
-                    serial->setPointColorCount(lastColorCount);
-                    serial->setDoDelete(false);
-                }
-                point.x=serial->getPointX();
-                point.y=serial->getPointY();
-                point.colorCounter=serial->getPointColorCount();
+    //draw a "cursor" point
+    int penWidth = 5;
+    serial->setMyColor(point.colorCounter);
+    painter.setPen(QPen(static_cast<QColor>(serial->getMyColor()), penWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter.drawPoint(serial->getPointX(),serial->getPointY());
 
-                if (point.x < 0)
-                {
-                    serial->setPointX(0);
-
-                }
-                if (point.x > width())
-                {
-                    serial->setPointX(width());
-                }
-
-               if (point.y > height())
-                {
-                    serial->setPointY(height());
-                }
-                if (point.y < 0)
-                {
-                    serial->setPointY(0);
-                }
-                if (point.colorCounter>=17)
-                {
-                    serial->setPointColorCount(0);
-                }
-
-                pointList.push_back(point);             
-                for(std::vector<Points>::iterator it = pointList.begin(); it != pointList.end(); ++it) {
-
-                    if (it != pointList.end())
-                    {              
-                        std::vector<Points>::iterator it2 = it;
-                        it2++;
-                        if (it2!=pointList.end())
-                        {
-                          serial->setMyColor(it->colorCounter);
-                          int w = 4;
-                          painter.setPen(QPen(static_cast<QColor>(serial->myColor), w, Qt::SolidLine, Qt::FlatCap, Qt::RoundJoin));
-                          painter.drawLine(it->x,it->y,it2->x,it2->y);
-                        }
-                    }else{
-                        break;
-                    }
-
-                 }
-                int width = 5;
-                painter.setPen(QPen(static_cast<QColor>(serial->myColor), width, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-                painter.drawPoint(serial->getPointX(),serial->getPointY());
-                break;
-
-            }
-            painter.restore();
-
+    painter.restore();
 
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setPen(palette().dark().color());

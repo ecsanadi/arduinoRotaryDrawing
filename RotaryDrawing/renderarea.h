@@ -15,18 +15,10 @@ class RenderArea : public QWidget
 public:
     enum Shape { Line/*, Points, Polyline, Polygon, Rect, RoundedRect, Ellipse, Arc,
                  Chord, Pie, Path, Text, Pixmap */};
-
     RenderArea(QWidget *parent = 0);
-
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
-    QSize screenSize;
-
-
     void setSerialReader(SerialReader *);
-
-    //SerialReader serialo;
-
 
 public slots:
     void setShape(Shape shape);
@@ -50,6 +42,7 @@ private:
     Points point;
     Points iniPoint;
     std::vector<Points> pointList;
+    QSize screenSize;
 };
 
 #endif // RENDERAREA_H
